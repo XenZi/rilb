@@ -1,3 +1,4 @@
+import { injectable } from "inversify";
 import winston, {
   Logger as WinstonLogger,
   transports,
@@ -5,6 +6,7 @@ import winston, {
   format,
 } from "winston";
 
+@injectable()
 class Logger {
   private logger: WinstonLogger;
 
