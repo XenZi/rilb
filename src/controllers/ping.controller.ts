@@ -1,5 +1,5 @@
 import { controller, httpGet } from "inversify-express-utils";
-import PingService from "../services/ping.service";
+import PingService from "@services/ping.service";
 import { Request, Response } from "express";
 import Logger from "../config/logger.config";
 

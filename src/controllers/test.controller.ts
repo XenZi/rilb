@@ -1,14 +1,15 @@
-import { controller, httpGet } from "inversify-express-utils"; 
-import { Request,Response } from "express"; 
+import { controller, httpGet } from "inversify-express-utils";
+import { Request, Response } from "express";
+import { BaseHttpResponse } from "@models/base-http-response.model";
+import { HttpException } from "@exceptions/http.exception";
 
+@controller("/test")
+class TestController {
+  constructor() {}
 
-@controller("Test") 
-class TestController { 
-    constructor() {} 
-
-    @httpGet("/test") 
-    get(req:Request, res: Response) { 
-        // Controller logic here 
-    } 
-} 
+  @httpGet('/')
+  get(req: Request, res: Response) {
+    throw new HttpException("Not implemented", 501);
+  }
+}
 export default TestController;

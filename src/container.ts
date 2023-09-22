@@ -1,8 +1,9 @@
-import PingService from "./services/ping.service";
+// import PingService from "./services/ping.service";
 import "./controllers/ping.controller";
 import "./controllers/test.controller";
 import { Container } from "inversify";
 import Logger from "./config/logger.config";
+import PingService from "@services/ping.service";
 
 export const container = new Container({
   defaultScope: "Singleton",
