@@ -1,4 +1,4 @@
-import { controller, httpGet } from "inversify-express-utils";
+import { BaseHttpController, controller, httpGet, httpPost } from "inversify-express-utils";
 import PingService from "@services/ping.service";
 import { Request, Response } from "express";
 import Logger from "../config/logger.config";
@@ -24,21 +24,19 @@ import Logger from "../config/logger.config";
  *                 example: "ok"
  */
 @controller("/ping")
-class PingController {
+export class PingController extends BaseHttpController{
   constructor(
     private readonly _pingService: PingService,
     private readonly _logger: Logger
-  ) {}
+  ) {
+    super();
+  }
 
   @httpGet("/")
   getHelloTask(req: Request, res: Response) {
-    this._logger.info("Ping attached!");
-    this._logger.debug("Debug mode");
-    this._logger.error("Error mode");
-    this._logger.warn("Warn mode");
-    this._pingService.consoleFromService();
-    return res.json("CCC");
+    return res.json({
+      "status": "ok"
+    });
   }
 }
 
-export default PingController;

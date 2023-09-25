@@ -1,46 +1,66 @@
 import "module-alias/register";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { InversifyExpressServer } from "inversify-express-utils";
-import { container } from "./container";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { ValidationException } from "@exceptions/validation.exception";
 import { BaseHttpResponse } from "@models/base-http-response.model";
 import { HttpException } from "@exceptions/http.exception";
+import { Container } from "inversify";
+import { container } from "./container";
+import { Database } from "./data-source/database.context";
+import { TYPE } from 'inversify-express-utils';
+import Logger from "./config/logger.config";
+
+
 class Application {
-  constructor() {}
+  private readonly _container: Container;
+  private readonly _logger: Logger;
+  constructor() {
+    this._container = container;
+    this._logger = this._container.get(Logger);
+  }
 
   public listen(): void {
-    const server = new InversifyExpressServer(container);
+    const server = new InversifyExpressServer(this._container);
     const swaggerSpec = this.configureSwagger();
-    server.setConfig((app) => {
-      app.use(express.json());
-      app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    const db = this._container.get(Database);
+
+    db.appDataSource.initialize().then(exp => {
+      this._logger.info("Data source initialized");
     });
+
     server.setErrorConfig((app) => {
-      app.use((err: any, req: any, res: any, next: any) => {
+      app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+        this._logger.error(err?.message);
         if (err instanceof HttpException) {
           const response = BaseHttpResponse.failed(err.message, err.statusCode);
+
           return res.status(response.statusCode).json(response);
         }
         if (err instanceof ValidationException) {
           const response = BaseHttpResponse.failed(err.message, 422);
           return res.status(response.statusCode).json(response);
         }
-
+    
         if (err instanceof Error) {
           const response = BaseHttpResponse.failed(err.message, 500);
           return res.status(response.statusCode).json(response);
         }
-
+    
         next();
       });
     });
+
+    this.configureServer(server, swaggerSpec);
     const app = server.build();
 
+
     app.listen(3000, () => {
-      console.log("App running on 3000");
+      this._logger.info("Server running on port 3000");
     });
+
+
   }
 
   configureSwagger() {
@@ -58,6 +78,32 @@ class Application {
     };
     const swaggerSpec = swaggerJSDoc(options);
     return swaggerSpec;
+  }
+
+  configureServer(server: InversifyExpressServer, swaggerSpec: swaggerJSDoc.Options) {
+    server.setConfig((app) => {
+      app.use(express.json());
+      app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    });
+  }
+
+  errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
+    console.error('Error caught by errorHandler:', err);
+    if (err instanceof HttpException) {
+      const response = BaseHttpResponse.failed(err.message, err.statusCode);
+      return res.status(response.statusCode).json(response);
+    }
+    if (err instanceof ValidationException) {
+      const response = BaseHttpResponse.failed(err.message, 422);
+      return res.status(response.statusCode).json(response);
+    }
+
+    if (err instanceof Error) {
+      const response = BaseHttpResponse.failed(err.message, 500);
+      return res.status(response.statusCode).json(response);
+    }
+
+    next();
   }
 }
 
