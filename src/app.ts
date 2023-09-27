@@ -11,6 +11,7 @@ import { container } from "./container";
 import { Database } from "./data-source/database.context";
 import { TYPE } from 'inversify-express-utils';
 import Logger from "./config/logger.config";
+import { UnathorizedException } from "@exceptions/unathorized.exception";
 
 
 class Application {
@@ -35,19 +36,21 @@ class Application {
         this._logger.error(err?.message);
         if (err instanceof HttpException) {
           const response = BaseHttpResponse.failed(err.message, err.statusCode);
-
           return res.status(response.statusCode).json(response);
         }
         if (err instanceof ValidationException) {
           const response = BaseHttpResponse.failed(err.message, 422);
           return res.status(response.statusCode).json(response);
         }
-    
+        if (err instanceof UnathorizedException) {
+          const response = BaseHttpResponse.failed(err.message, 401);
+          return res.status(response.statusCode).json(response);
+        }
         if (err instanceof Error) {
           const response = BaseHttpResponse.failed(err.message, 500);
           return res.status(response.statusCode).json(response);
         }
-    
+
         next();
       });
     });
@@ -56,8 +59,8 @@ class Application {
     const app = server.build();
 
 
-    app.listen(3000, () => {
-      this._logger.info("Server running on port 3000");
+    app.listen(process.env.port || 3000, () => {
+      this._logger.info(`Server running on port ${process.env.port || 3000}`);
     });
 
 

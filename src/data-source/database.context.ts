@@ -9,8 +9,8 @@ export class Database {
         host: "localhost",
         port: 3306,
         username: "root",
-        password: "password",
-        database: "db-name",
+        password: "root1234",
+        database: "rilb",
         synchronize: true,
         entities: [],
     });

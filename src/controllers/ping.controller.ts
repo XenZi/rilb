@@ -1,7 +1,13 @@
-import { BaseHttpController, controller, httpGet, httpPost } from "inversify-express-utils";
+import {
+  BaseHttpController,
+  controller,
+  httpGet,
+  httpPost,
+} from "inversify-express-utils";
 import PingService from "@services/ping.service";
 import { Request, Response } from "express";
 import Logger from "../config/logger.config";
+import { AuthenticateJWT } from "@security/authentication";
 
 /**
  * @swagger
@@ -24,7 +30,7 @@ import Logger from "../config/logger.config";
  *                 example: "ok"
  */
 @controller("/ping")
-export class PingController extends BaseHttpController{
+export class PingController extends BaseHttpController {
   constructor(
     private readonly _pingService: PingService,
     private readonly _logger: Logger
@@ -35,8 +41,10 @@ export class PingController extends BaseHttpController{
   @httpGet("/")
   getHelloTask(req: Request, res: Response) {
     return res.json({
-      "status": "ok"
+      status: "ok",
     });
   }
-}
 
+  @httpPost("/", AuthenticateJWT.middleware)
+  async testFunc() {}
+}
