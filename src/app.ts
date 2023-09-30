@@ -13,6 +13,10 @@ import { TYPE } from "inversify-express-utils";
 import Logger from "./config/logger.config";
 import { UnathorizedException } from "@exceptions/unathorized.exception";
 import { errorHandler } from "./middleware/error-handler.middleware";
+import morgan from "morgan";
+import { MorganMode } from "@enums/morgan-mode";
+import { createWriteStream } from "fs";
+import path from "path";
 
 class Application {
   private readonly _container: Container;
@@ -66,6 +70,16 @@ class Application {
   ) {
     server.setConfig((app) => {
       app.use(express.json());
+      app.use(
+        morgan(MorganMode.COMBINED, {
+          stream: createWriteStream(
+            path.join(__dirname + "/logs", "access.log"),
+            {
+              flags: "a",
+            }
+          ),
+        })
+      );
       app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     });
   }
