@@ -1,20 +1,15 @@
 import "module-alias/register";
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import { InversifyExpressServer } from "inversify-express-utils";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { ValidationException } from "@exceptions/validation.exception";
-import { BaseHttpResponse } from "@models/base-http-response.model";
-import { HttpException } from "@exceptions/http.exception";
 import { Container } from "inversify";
 import { container } from "./container";
 import { Database } from "./data-source/database.context";
-import { TYPE } from "inversify-express-utils";
 import Logger from "./config/logger.config";
-import { UnathorizedException } from "@exceptions/unathorized.exception";
 import { errorHandler } from "./middleware/error-handler.middleware";
 import morgan from "morgan";
-import { MorganMode } from "@enums/morgan-mode";
+import { MorganMode } from "@enums/morgan-mode.enum";
 import { createWriteStream } from "fs";
 import path from "path";
 

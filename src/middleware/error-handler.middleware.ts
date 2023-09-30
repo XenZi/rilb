@@ -5,6 +5,7 @@ import { BaseHttpResponse } from "@models/base-http-response.model";
 import { HttpException } from "@exceptions/http.exception";
 import { ValidationException } from "@exceptions/validation.exception";
 import { UnathorizedException } from "@exceptions/unathorized.exception";
+import { HttpStatus } from "@enums/http-status.enum";
 
 const logger: Logger = container.get(Logger);
 
@@ -20,15 +21,24 @@ export const errorHandler = (
     return res.status(response.statusCode).json(response);
   }
   if (err instanceof ValidationException) {
-    const response = BaseHttpResponse.failed(err.message, 422);
+    const response = BaseHttpResponse.failed(
+      err.message,
+      HttpStatus.UNPROCESSABLE_ENTITY
+    );
     return res.status(response.statusCode).json(response);
   }
   if (err instanceof UnathorizedException) {
-    const response = BaseHttpResponse.failed(err.message, 401);
+    const response = BaseHttpResponse.failed(
+      err.message,
+      HttpStatus.UNAUTHORIZED
+    );
     return res.status(response.statusCode).json(response);
   }
   if (err instanceof Error) {
-    const response = BaseHttpResponse.failed(err.message, 500);
+    const response = BaseHttpResponse.failed(
+      err.message,
+      HttpStatus.INTERNAL_SERVER_ERROR
+    );
     return res.status(response.statusCode).json(response);
   }
 
