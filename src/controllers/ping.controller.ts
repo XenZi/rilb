@@ -8,6 +8,7 @@ import PingService from "@services/ping.service";
 import { Request, Response } from "express";
 import Logger from "../config/logger.config";
 import { AuthenticateJWT } from "@security/authentication";
+import { verifyJWT } from "src/middleware/verify-jwt.middleware";
 
 /**
  * @swagger
@@ -45,6 +46,6 @@ export class PingController extends BaseHttpController {
     });
   }
 
-  @httpPost("/", AuthenticateJWT.middleware)
+  @httpPost("/", verifyJWT)
   async testFunc() {}
 }
