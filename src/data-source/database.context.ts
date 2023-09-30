@@ -7,9 +7,9 @@ export class Database {
     type: "mysql",
     host: "localhost",
     port: 3306,
-    username: "username here",
-    password: "password here",
-    database: "db name here",
+    username: "root",
+    password: "root1234",
+    database: "rilb",
     synchronize: true,
     entities: [],
   });
